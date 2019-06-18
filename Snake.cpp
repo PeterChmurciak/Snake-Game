@@ -130,6 +130,12 @@ void Logic()
         if(slowDown>0)
             slowDown--;
     }
+
+    for(int j=1; j<=tailLength; j++)
+    {
+        if(headX==tailX[j] && headY==tailY[j])
+            gameOver = true;
+    }
 }
 
 int main()
