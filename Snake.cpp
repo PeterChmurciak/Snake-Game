@@ -1,57 +1,57 @@
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include <conio.h>
-#include <windows.h>
+#include <iostream>                                       // To be able to use cout,endl
+#include <cstdlib>                                        // To be able to use rand(),srand()
+#include <ctime>                                          // To be able to use time()
+#include <conio.h>                                        // To be able to use _kbhit(),_getch()
+#include <windows.h>                                      // To be able to use system(),Sleep()
 
-bool gameOver;
-const int fieldWidth = 30;
+bool gameOver;                                            // Flag to end the game
+const int fieldWidth = 30;                                // Size and area of playing field for snake
 const int fieldHeight = 15;
 const int fieldArea = fieldWidth*fieldHeight;
-int headX, headY, fruitX, fruitY, score;
-enum eDirection {STOP,LEFT,RIGHT,UP,DOWN} direction;
-int tailX[fieldArea],tailY[fieldArea];
-int tailLength = 0;
-int slowDown = 50;
+int headX, headY, fruitX, fruitY, score;                  // Coordinates of snakes head,fruit and score counter
+enum eDirection {STOP,LEFT,RIGHT,UP,DOWN} direction;      // Variable to store current direction
+int tailX[fieldArea],tailY[fieldArea];                    // Arrays to store tail segment coordinates
+int tailLength = 0;                                       // Number of tail segments
+int slowDown = 50;                                        // Variable to slow down snake movement
 
-void Setup()
+void Setup()                                              // Initialization of variables
 {
     gameOver = false;
     direction = STOP;
-    headX = fieldWidth/2;
+    headX = fieldWidth/2;                                 // Start in the middle of field
     headY = fieldHeight/2;
-    srand(time(NULL));
+    srand(time(NULL));                                    // Random initial position of fruit
     fruitX = 1+rand()%fieldWidth;
     fruitY = 1+rand()%fieldHeight;
     score = 0;
 }
 
-void Draw()
+void Draw()                                                              // Drawing the content into console window
 {
-    system("cls");
+    system("cls");                                                       // Clear the console window
     std::cout<<"Press W,S,A,D to move. Press X to end the game.\n"<<std::endl;
-    for(int i=0; i<fieldHeight+2; i++)
+    for(int i=0; i<fieldHeight+2; i++)                                   // Iterate through rows of console window
     {
-        for(int j=0; j<fieldWidth+2; j++)
+        for(int j=0; j<fieldWidth+2; j++)                                // Iterate through columns of console window
         {
-            if(i==0 || i==fieldHeight+1 || j==0 || j==fieldWidth+1)
+            if(i==0 || i==fieldHeight+1 || j==0 || j==fieldWidth+1)      // Draw field borders
                 std::cout<<'#';
-            else if(j==headX && i==headY)
+            else if(j==headX && i==headY)                                // Draw snakes head
                 std::cout<<'O';
-            else if(j==fruitX && i==fruitY)
+            else if(j==fruitX && i==fruitY)                              // Draw fruit
                 std::cout<<'F';
             else
             {
                 bool tailPrint = false;
-                for(int k=1; k<=tailLength; k++)
+                for(int k=1; k<=tailLength; k++)                         // Iterate through tail segments
                 {
-                    if(j==tailX[k] && i==tailY[k])
+                    if(j==tailX[k] && i==tailY[k])                       // Draw snakes tail
                     {
                         std::cout<<'o';
                         tailPrint = true;
                     }
                 }
-                if(!tailPrint)
+                if(!tailPrint)                                           // Draw empty spaces
                     std::cout<<' ';
             }
         }
@@ -60,11 +60,11 @@ void Draw()
     std::cout<<"\nScore: "<<score<<std::endl;
 }
 
-void Input()
+void Input()                       // Getting input from user
 {
-    if(_kbhit())
+    if(_kbhit())                   // If key on keyboard is pressed
     {
-        switch(_getch())
+        switch(_getch())           // Make a decision based on which key is pressed
         {
         case 'a':
             direction = LEFT;
@@ -85,17 +85,17 @@ void Input()
     }
 }
 
-void Logic()
+void Logic()                          // Controlling the movement of snake
 {
     tailX[0] = headX;
     tailY[0] = headY;
-    for(int i=tailLength; i>0; i--)
+    for(int i=tailLength; i>0; i--)   // Moving each tail segment into next position
     {
         tailX[i] = tailX[i-1];
         tailY[i] = tailY[i-1];
     }
 
-    switch(direction)
+    switch(direction)                 // Move snakes head based on currently pressed key
     {
     case LEFT:
         headX--;
@@ -111,7 +111,7 @@ void Logic()
         break;
     }
 
-    if(headX<=0)
+    if(headX<=0)                        // Ability to warp between upper/lower and left/right wall
         headX = fieldWidth;
     else if(headX>=fieldWidth+1)
         headX = 1;
@@ -120,18 +120,18 @@ void Logic()
     else if(headY>=fieldHeight+1)
         headY = 1;
 
-    if(headX==fruitX && headY==fruitY)
+    if(headX==fruitX && headY==fruitY)  // If fruit has been eaten
     {
         score++;
-        srand(time(NULL));
+        srand(time(NULL));              // Generate new fruit position
         fruitX = 1+rand()%fieldWidth;
         fruitY = 1+rand()%fieldHeight;
-        tailLength++;
-        if(slowDown>0)
+        tailLength++;                   // Add a new tail segment
+        if(slowDown>0)                  // Speed up snake a little
             slowDown--;
     }
 
-    for(int j=1; j<=tailLength; j++)
+    for(int j=1; j<=tailLength; j++)    // Detect collision with tail
     {
         if(headX==tailX[j] && headY==tailY[j])
             gameOver = true;
@@ -140,13 +140,13 @@ void Logic()
 
 int main()
 {
-    Setup();
+    Setup();             // Initialization of variables
     while(!gameOver)
     {
-        Draw();
-        Input();
-        Logic();
-        Sleep(slowDown);
+        Draw();          // Drawing the content into console window
+        Input();         // Getting input from user
+        Logic();         // Controlling the movement of snake
+        Sleep(slowDown); // Slowing down the snakes movement
     }
     return 0;
 }
