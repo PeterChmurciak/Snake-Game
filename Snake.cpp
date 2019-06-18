@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <conio.h>
+#include <windows.h>
 
 bool gameOver;
 const int fieldWidth = 30;
@@ -11,6 +12,7 @@ int headX, headY, fruitX, fruitY, score;
 enum eDirection {STOP,LEFT,RIGHT,UP,DOWN} direction;
 int tailX[fieldArea],tailY[fieldArea];
 int tailLength = 0;
+int slowDown = 50;
 
 void Setup()
 {
@@ -125,6 +127,8 @@ void Logic()
         fruitX = 1+rand()%fieldWidth;
         fruitY = 1+rand()%fieldHeight;
         tailLength++;
+        if(slowDown>0)
+            slowDown--;
     }
 }
 
@@ -136,6 +140,7 @@ int main()
         Draw();
         Input();
         Logic();
+        Sleep(slowDown);
     }
     return 0;
 }
